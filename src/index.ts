@@ -33,7 +33,8 @@ var createScene = async function () {
         scene
     );
     light.intensity = 0.7;
-
+    var cannonPlugin = new CannonJSPlugin(true,10,cannon);
+    scene.enablePhysics(new Vector3(0,-3,0), cannonPlugin);
     // Add an object
     var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
     sphere.position.y = 1;
@@ -48,6 +49,33 @@ var createScene = async function () {
     return scene;
 };
 
+// Create a default engine to load the scene
+try {
+    engine = createDefaultEngine();
+  } catch (e) {
+    console.log(
+      "the available createEngine function failed. Creating the default engine instead"
+    );
+    engine = createDefaultEngine();
+  }
+  if (!engine) throw "engine should not be null.";
+  
+  // Create the scene
+  createScene().then((returnedScene) => {
+    sceneToRender = returnedScene;
+  });
+  
+  // Render the scene by using the engine
+  engine.runRenderLoop(function () {
+    if (sceneToRender) {
+      sceneToRender.render();
+    }
+  });
+  
+  // Resize the engine to fit the scene
+  window.addEventListener("resize", function () {
+    engine.resize();
+  });
 // -------------------------------------------------------------------------------
 // Run the game
 // -------------------------------------------------------------------------------
